@@ -23,31 +23,84 @@ import React, { ReactNode } from "react";
 import { useProModal } from "@/hooks/use-pro-modal";
 
 
+
+// interface CodeBlockProps {
+//   children: Array<string> | ReactNode ;
+// }
+
+// const CodeBlock = ({ children }:CodeBlockProps) => {
+
+//   const [isClicked, setIsClicked] = useState(false);
+//   const [message, setMessage] = useState("");
+
+//   const handleCopy = async (codeContent:Array<string>) => {
+//     const text=codeContent[0].props.children[0];
+//     try {
+//       await navigator.clipboard.writeText(text);
+//       setIsClicked(true);
+//       setMessage("Copied to clipboard!");
+//       setTimeout(() => {
+//         setIsClicked(false);
+//       }, 3000);
+//     } catch (error) {
+//       setIsClicked(true);
+//       setMessage("Failed to copy code");
+//       setTimeout(() => {
+//         setIsClicked(false);
+//       }, 3000);
+//       console.error("Copy to clipboard failed:", error);
+//     }
+//   };
+
+//   return (
+//     <div className="relative">
+//       {isClicked && <div className="text-white">{message}</div>}
+//       <button
+//         onClick={()=>handleCopy(children)}
+//         className="absolute right-2 top-2  bg-white dark:bg-black  p-1 text-xs rounded border border-gray-300 focus:outline-none"
+//       >
+//         {isClicked ? "Copied!" : "Copy"}
+//       </button>
+//       <div className="overflow-auto w-full my-2 bg-black/10 p-2 rounded-lg">
+//         <pre>
+//           <code className="bg-black/10 rounded-lg p-1">{children}</code>
+//         </pre>
+//       </div>
+//     </div>
+//   );
+// };
+
+
+
 interface CodeBlockProps {
-  children: Array<string> | ReactNode ;
+  children: Array<string> | React.ReactNode;
 }
 
-const CodeBlock = ({ children }:CodeBlockProps) => {
-  const proModal=useProModal();
+const CodeBlock = ({ children }: CodeBlockProps) => {
   const [isClicked, setIsClicked] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleCopy = async (codeContent:Array<string>) => {
-    const text=codeContent[0].props.children[0];
-    try {
-      await navigator.clipboard.writeText(text);
-      setIsClicked(true);
-      setMessage("Copied to clipboard!");
-      setTimeout(() => {
-        setIsClicked(false);
-      }, 3000);
-    } catch (error) {
-      setIsClicked(true);
-      setMessage("Failed to copy code");
-      setTimeout(() => {
-        setIsClicked(false);
-      }, 3000);
-      console.error("Copy to clipboard failed:", error);
+  const handleCopy = async (codeContent: Array<string> | React.ReactNode) => {
+    if (Array.isArray(codeContent)) {
+      const text = codeContent[0];
+      try {
+        await navigator.clipboard.writeText(text);
+        setIsClicked(true);
+        setMessage("Copied to clipboard!");
+        setTimeout(() => {
+          setIsClicked(false);
+        }, 3000);
+      } catch (error) {
+        setIsClicked(true);
+        setMessage("Failed to copy code");
+        setTimeout(() => {
+          setIsClicked(false);
+        }, 3000);
+        console.error("Copy to clipboard failed:", error);
+      }
+    } else {
+      // Handle case when children is ReactNode (not an array of strings)
+      console.error("Invalid children type. Expected an array of strings.");
     }
   };
 
@@ -55,8 +108,8 @@ const CodeBlock = ({ children }:CodeBlockProps) => {
     <div className="relative">
       {isClicked && <div className="text-white">{message}</div>}
       <button
-        onClick={()=>handleCopy(children)}
-        className="absolute right-2 top-2  bg-white dark:bg-black  p-1 text-xs rounded border border-gray-300 focus:outline-none"
+        onClick={() => handleCopy(children)}
+        className="absolute right-2 top-2 bg-white dark:bg-black p-1 text-xs rounded border border-gray-300 focus:outline-none"
       >
         {isClicked ? "Copied!" : "Copy"}
       </button>
@@ -70,7 +123,11 @@ const CodeBlock = ({ children }:CodeBlockProps) => {
 };
 
 
+
+
+
 const CodePage = () => {
+  const proModal=useProModal();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -97,10 +154,11 @@ const CodePage = () => {
       console.log(setMessages);
       form.reset();
     } catch (error: any) {
+      
+      //TODo Open Pro Model
       if(error?.response?.status===403){
         proModal.onOpen();
       }
-      //TODo Open Pro Model
       console.log(error);
     } finally {
       router.refresh();

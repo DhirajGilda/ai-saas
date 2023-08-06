@@ -10,8 +10,8 @@ const testimonials = [
     description: "This is the best application I've ever used!",
   },
   {
-    name: "Antonio",
-    avatar: "A",
+    name: "Julia",
+    avatar: "J",
     title: "Designer",
     description: "I use this daily for generating new photos!",
   },
